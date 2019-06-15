@@ -6,6 +6,9 @@ class Config(object):
         
 
         self.verbose = True  #是否输出预测过程
+        self.verbose_count = 2
+        self.epoches = 1000
+        self.learning_rate= 0.01
 
 class mfConfig(Config):
     def __init__(self):
@@ -36,7 +39,7 @@ class naisConfig(Config):
         self.time_embedding_size = 8
         self.embedding_size =16
         self.weight_size = 16
-        self.epoches = 1000
+        
         self.beta = 0.5
         self.alpha = 0
         regs = [1e-5, 1e-7, 1e-4]
@@ -45,8 +48,6 @@ class naisConfig(Config):
         self.eta_bilinear = regs[2]
         self.lr = 0.01
         self.K = 10
-        self.verbose_count = 20
-        self.learning_rate= 0.01
         self.mode = 'month'
         self.len_history = 500
 class svdConfig(Config):
@@ -62,5 +63,4 @@ class svdConfig(Config):
         self.regU3 = 1e-5
         self.factors = 16
         self.batch_size = 256
-        self.epoches = 1000
         self.neg_count = 4

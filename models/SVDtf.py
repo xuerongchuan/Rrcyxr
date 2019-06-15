@@ -22,7 +22,7 @@ class SVD(object):
         with tf.name_scope('input_data'):
             self.user_idx = tf.placeholder(tf.int32, shape=[None,], name='user_idx')
             self.item_idx = tf.placeholder(tf.int32, shape=[None,], name = 'item_idx')
-            self.labels = tf.placeholder(tf.float32, shape=[None,1], name='labels')
+            self.labels = tf.placeholder(tf.float32, shape=[None,], name='labels')
     
     def _create_variables(self):
         with tf.name_scope('embeddings'):
@@ -37,14 +37,15 @@ class SVD(object):
     def _create_inference(self):
         with tf.name_scope('inference'):
             self.embedding_pu = tf.nn.embedding_lookup(self.embedding_P, self.user_idx) #(b,k)
-            self.embedding_q = tf.nn.embedding_lookup(self.embedding_Q, self.item_idx)
+            self.embedding_q = tf.nn.embedding_lookup(self.embedding_Q, self.item_idx) 
             self.U_bias_embed = tf.nn.embedding_lookup(self.U_bias, self.user_idx)
             self.V_bias_embed = tf.nn.embedding_lookup(self.V_bias, self.item_idx)
-            self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.embedding_pu * self.embedding_q,1),1))
+            self.output = tf.sigmoid(tf.reduce_sum(self.embedding_pu * self.embedding_q,1))
             self.output += self.U_bias_embed+self.V_bias_embed
             
     def _create_loss(self):
         with tf.name_scope("loss"):
+            print(self.output.shape)
             self.loss = tf.losses.log_loss(self.labels, self.output) +  \
                                           self.regU*tf.reduce_sum(tf.square(self.embedding_P)) + \
                                         self.regI*tf.reduce_sum(tf.square(self.embedding_Q)) + \
@@ -79,7 +80,7 @@ class SVD(object):
                     
                     labels_data = np.array(train_data[2]).astype(np.float32)
                     
-                    feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data[:, np.newaxis]}
+                    feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data}
                     sess.run(self.train_U, feed_dict)
                     sess.run(self.train_V, feed_dict)
                     
@@ -98,7 +99,7 @@ class SVD(object):
                         
                         labels_data = np.array(train_data[2]).astype(np.float32)
                         
-                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data[:, np.newaxis]}
+                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data}
                         train_loss += sess.run(self.loss, feed_dict)
                         batch_i+=1
                     train_loss = train_loss/batch_i
@@ -115,7 +116,7 @@ class SVD(object):
                         
                         labels_data = np.array(test_data[2]).astype(np.float32)
                         
-                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data[:, np.newaxis]}
+                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data, self.labels: labels_data}
                         predictions,test_loss = sess.run([self.output,self.loss], feed_dict = feed_dict)
                         predictions = predictions.flatten()
         #                 min_ = np.min(predictions)
