@@ -15,17 +15,8 @@ class Dataloader(object):
     '''
     def __init__(self, config):
         self.config = config
-        self.date = self.config.mode
         self.num_items = 3706 #数据预处理时计算的
         self.num_users = 6040
-        if self.config.mode == 'season':
-            self.numT = 9
-            self.data_path = 'data/season/'
-        elif self.config.mode == 'month':
-            self.numT = 31
-        elif self.config.mode == 'day':
-            self.numT = 1039
-            self.data_path = 'data/day/'
         self.loadITmap()
         
      

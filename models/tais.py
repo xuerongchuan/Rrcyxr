@@ -28,7 +28,7 @@ class TAIS(object):
             self.embedding_Q_ = tf.concat([c1, c2], 0 , name='emebedding_Q_') 
             self.embedding_Q = tf.Variable(tf.truncated_normal(shape=[self.dl.num_items,self.config.embedding_size]), name='embediing_Q', \
                                      dtype=tf.float32)
-            t1 = tf.Variable(tf.truncated_normal(shape=[self.dl.numT+1, self.config.time_embedding_size], mean=0.0, stddev=0.01),\
+            t1 = tf.Variable(tf.truncated_normal(shape=[self.dl.numT, self.config.time_embedding_size], mean=0.0, stddev=0.01),\
                             name='t1', dtype = tf.float32)
             t2 = tf.constant(0.0, tf.float32, [1, self.config.time_embedding_size], name='t2')
             self.embedding_T = tf.concat([t1, t2], 0 , name='emebedding_T')

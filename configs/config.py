@@ -25,18 +25,30 @@ class mfConfig(Config):
         self.n = 10 #CF算法的近邻数
         
 class naisConfig(Config):
-    def __init__(self):
+    def __init__(self, mode):
         super(naisConfig, self).__init__()       
         #naisData
+        if mode == 'season':
+            self.numT = 9
+            self.data_path = 'data/season/'
+        elif mode == 'month':
+            self.numT = 31
+            self.data_path = 'data/month/'
+        elif mode == 'day':
+            self.numT = 1039
+            self.data_path = 'data/day/'
+        elif mode == 'rating':
+            self.data_path = 'data/rating/'
+            self.numT = 31
         self.numrows = 10000
-        data_path = 'data/month/'
-        self.train_path = data_path+'hist_u'
-        self.test_path = data_path+'test_u'
-        self.itmap = data_path+'itmap'
+        
+        self.train_path = self.data_path+'hist_u'
+        self.test_path = self.data_path+'test_u'
+        self.itmap = self.data_path+'itmap'
         #nais
         
         self.neg_count = 4
-        self.time_embedding_size = 8
+        self.time_embedding_size = 16
         self.embedding_size =16
         self.weight_size = 16
         
@@ -48,8 +60,9 @@ class naisConfig(Config):
         self.eta_bilinear = regs[2]
         self.lr = 0.01
         self.K = 10
-        self.mode = 'month'
         self.len_history = 500
+        
+
 class svdConfig(Config):
     def __init__(self):
         super(svdConfig, self).__init__()
