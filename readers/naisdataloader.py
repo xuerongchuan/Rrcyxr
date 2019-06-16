@@ -18,9 +18,10 @@ class Dataloader(object):
         self.num_items = 3706 #数据预处理时计算的
         self.num_users = 6040
         self.loadITmap()
-        
+        self.numT = self.config.numT
+        self.numrows = self.config.numrows
      
-    def trainset(self, numrow=10):
+    def trainset(self):
         if not os.path.isfile(self.config.train_path):
             print('输入路径有问题', self.config.train_path)
             sys.exit()
@@ -30,20 +31,20 @@ class Dataloader(object):
                 data = json.loads(line)
                 if len(data) > self.config.len_history:
                     data = data[:self.config.len_history]
-                if i>numrow:
+                if i>self.numrows:
                     break
                 i+=1
                 yield data
                 
     
-    def testset(self, numrow=10):
+    def testset(self):
         if not os.path.isfile(self.config.test_path):
             print('输入路径有问题', self.config.test_path)
             sys.exit()
         with open(self.config.test_path, 'r') as f:
             i=0
             for line in f:
-                if i>numrow:
+                if i>self.numrows:
                     break
                 i+=1
                 yield json.loads(line)
@@ -166,19 +167,19 @@ class getBatchData(object):
             i_batches.append(it[0])
         return u_batches, ut_batches, i_batches, label_batches,t_batches, tu
     def generateTrainData(self):
-        for uData in self.dl.trainset(self.config.numrows):
+        for uData in self.dl.trainset():
             value = self.getInputData(uData)
             yield value
     def generateTestData(self):
-        for uData in self.dl.trainset(self.config.numrows):
+        for uData in self.dl.trainset():
             value = self.getTestData(uData)
             yield value
     def generateNormalTrainData(self):
-        for u, uData in enumerate(self.dl.trainset(self.config.numrows)):
+        for u, uData in enumerate(self.dl.trainset()):
             value = self.getNormalInputData(u,uData)
             yield value
     def generateNormalTestData(self):
-        for u, uData in enumerate(self.dl.trainset(self.config.numrows)):
+        for u, uData in enumerate(self.dl.trainset()):
             value = self.getNormalTestData(u, uData)
             yield value 
 

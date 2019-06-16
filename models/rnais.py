@@ -87,13 +87,12 @@ class RNAIS(object):
             # self.output = tf.layers.dense(embedding_p*embedding_q, units=1, activation = None)
         #     output = tf.map_fn(lambda x:x*5.0 , output)
             self.output = tf.layers.dense(self.embedding_p*self.embedding_q, units=16, activation = tf.nn.relu)
-            self.output = tf.layers.dense(self.output, 1, None)
+            self.output = tf.layers.dense(self.output, 1, None)+self.bias_i
 
             # self.output = tf.sigmoid(self.coeff*tf.expand_dims(tf.reduce_sum(self.embedding_p*self.embedding_q, 1),1) + self.bias_i)
     def _create_loss(self):
         with tf.name_scope("loss"):
-            self.loss = math.sqrt(sum((self.output-self.labels)**2)/len(labels_data))
-            self.loss =self.loss + \
+            self.loss =tf.losses.mean_squared_error(self.labels, self.output) + \
                         self.config.lambda_bilinear * tf.reduce_sum(tf.square(self.embedding_Q)) + \
                         self.config.gamma_bilinear * tf.reduce_sum(tf.square(self.embedding_Q_)) + \
                         self.config.eta_bilinear * tf.reduce_sum(tf.square(self.W))

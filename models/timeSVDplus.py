@@ -25,8 +25,8 @@ class timeSVD(object):
             self.item_idx = tf.placeholder(tf.int32, shape=[None,], name = 'item_idx')
             self.ut_idx = tf.placeholder(tf.int32, shape=[None, 2], name='ut_idx') # userid, t
             self.labels = tf.placeholder(tf.float32, shape=[None,1], name='labels')
-            self.tu = tf.placeholder(tf.int32, shape=[1], name='tu')
-            self.t_idx = tf.placeholder(tf.int32, shape=[None,], name = 't_idx')
+            self.tu = tf.placeholder(tf.float32, shape=[None,1], name='tu')
+  
     
     def _create_variables(self):
         with tf.name_scope('embeddings'):
@@ -46,15 +46,14 @@ class timeSVD(object):
             self.embedding_au = tf.nn.embedding_lookup(self.embedding_A, self.user_idx) #(b,k)
             self.embedding_put = tf.gather_nd(self.embedding_PT, self.ut_idx) #(b,,k)
             self.embedding_q = tf.nn.embedding_lookup(self.embedding_Q, self.item_idx)
-
-            self.pu = self.embedding_pu  + self.embedding_put + self.embedding_au*(self.t_idx-self.tu)
+            self.pu = self.embedding_pu  + self.embedding_put + self.embedding_au*self.tu
             self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.pu * self.embedding_q,1),1))
     def _create_loss(self):
         with tf.name_scope("loss"):
             self.loss = tf.losses.log_loss(self.labels, self.output) +  \
                                           self.regU1*tf.reduce_sum(tf.square(self.embedding_P)) + \
-                                        self.regI*tf.reduce_sum(tf.square(self.embedding_Q)) #+self.regU2*tf.reduce_sum(tf.square(self.embedding_A)) 
-#                                        +self.regU3*tf.reduce_sum(tf.square(self.embedding_PT)) 
+                                        self.regI*tf.reduce_sum(tf.square(self.embedding_Q)) +self.regU2*tf.reduce_sum(tf.square(self.embedding_A))  \
+                                        +self.regU3*tf.reduce_sum(tf.square(self.embedding_PT)) 
     def _create_optimizer(self):
         with tf.name_scope("optimizer"):
             self.optimizer = tf.train.AdagradOptimizer(learning_rate=self.config.learning_rate, initial_accumulator_value=1e-8).minimize(self.loss)
@@ -82,8 +81,8 @@ class timeSVD(object):
                     
                     labels_data = np.array(train_data[3]).astype(np.float32)
                     time_input_data = np.array(train_data[4]).astype(np.int32)
-                    tu_data = train_data[5]
-                    feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis], self.t_idx:time_input_data, self.tu:tu_data}
+                    tu_data = time_input_data - train_data[5]
+                    feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis], self.tu:tu_data[:, np.newaxis]}
                     training_loss, _ = sess.run([self.loss, self.optimizer], feed_dict)
                 train_time = time.time() - train_begin
                 if epoch_count % self.config.verbose_count ==0:
@@ -99,8 +98,8 @@ class timeSVD(object):
                         
                         labels_data = np.array(train_data[3]).astype(np.float32)
                         time_input_data = np.array(train_data[4]).astype(np.int32)
-                        tu_data = train_data[5]
-                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis], self.t_idx:time_input_data, self.tu:tu_data}
+                        tu_data = time_input_data - train_data[5]
+                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis],  self.tu:tu_data[:, np.newaxis]}
                         train_loss += sess.run(self.loss, feed_dict)
                         batch_i+=1
                     train_loss = train_loss/batch_i
@@ -109,6 +108,7 @@ class timeSVD(object):
                     eval_begin = time.time() 
                     hits, ndcgs, losses = [],[],[]
                     for test_data in self.gd.generateNormalTestData():
+                        print('#######')
                         user_input_data = np.array(test_data[0]).astype(np.int32)
 
                         time_input_data = np.array(test_data[1]).astype(np.float32)
@@ -118,8 +118,8 @@ class timeSVD(object):
                         labels_data = np.array(test_data[3]).astype(np.float32)
                         
                         time_input_data = np.array(test_data[4]).astype(np.int32)
-                        tu_data = test_data[5]
-                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis], self.t_idx:time_input_data, self.tu:tu_data}
+                        tu_data =  time_input_data - test_data[5]
+                        feed_dict = {self.user_idx: user_input_data,  self.item_idx: item_input_data,self.ut_idx:ut_input_data, self.labels: labels_data[:, np.newaxis],  self.tu:tu_data[:, np.newaxis]}
                         predictions,test_loss = sess.run([self.output,self.loss], feed_dict = feed_dict)
                         predictions = predictions.flatten()
         #                 min_ = np.min(predictions)
