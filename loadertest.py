@@ -1,12 +1,13 @@
-# -*- coding: utf-8 -*-
 from configs.config import naisConfig
 from readers.naisdataloader import Dataloader, getBatchData
-from models.tais import TAIS
 
-config = naisConfig('day')
+config = naisConfig('month')
 dl = Dataloader(config)
 gd = getBatchData(config, dl)
-tais = TAIS(config, gd)
-tais.build_graph()
-tais.train_and_evaluate()
+i=0
+for uData in dl.trainset():
+	print(uData)
+	if i >=1:
+		break
+	i+=1
 
