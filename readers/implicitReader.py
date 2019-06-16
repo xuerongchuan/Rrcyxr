@@ -23,8 +23,8 @@ class Dataloader(object):
         train_data= shuffle(train_data)
         self.trainset = list(zip(train_data['userId'], train_data['movieId']))
         self.train_len = len(train_data)
-        self.num_items = len(train_data.movieId.unique())
-        self.num_users = len(train_data.userId.unique())
+        self.num_items = 3706
+        self.num_users = 6040
     
     def _generate_neg_items(self, uhist):
         negative_items = []
