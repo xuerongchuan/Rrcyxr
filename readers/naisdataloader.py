@@ -20,7 +20,8 @@ class Dataloader(object):
         self.loadITmap()
         self.numT = self.config.numT
         self.numrows = self.config.numrows
-     
+    def init_data(self):
+        
     def trainset(self):
         if not os.path.isfile(self.config.train_path):
             print('输入路径有问题', self.config.train_path)

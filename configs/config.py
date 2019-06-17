@@ -25,26 +25,17 @@ class mfConfig(Config):
         self.n = 10 #CF算法的近邻数
         
 class naisConfig(Config):
-    def __init__(self, mode):
+    def __init__(self):
         super(naisConfig, self).__init__()       
         #naisData
-        if mode == 'season':
-            self.numT = 9
-            self.data_path = 'data/season/'
-        elif mode == 'month':
-            self.numT = 31
-            self.data_path = 'data/month/'
-        elif mode == 'day':
-            self.numT = 1039
-            self.data_path = 'data/day/'
-        elif mode == 'rating':
-            self.data_path = 'data/rating/'
-            self.numT = 31
+        self.data_path = 'data/'
+        self.trainfile = 'train.csv'
+        self.test_file = 'test.csv'
+        self.mode = 'day'
         self.numrows = 10000
         
-        self.train_path = self.data_path+'hist_u'
-        self.test_path = self.data_path+'test_u'
-        self.itmap = self.data_path+'itmap'
+        self.train_path = self.data_path+self.trainfile
+        self.test_path = self.data_path+self.test_file
         #nais
         
         self.neg_count = 4
@@ -77,3 +68,4 @@ class svdConfig(Config):
         self.factors = 16
         self.batch_size = 256
         self.neg_count = 4
+
