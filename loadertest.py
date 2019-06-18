@@ -1,13 +1,11 @@
 from configs.config import naisConfig
 from readers.naisdataloader import Dataloader, getBatchData
 
-config = naisConfig('month')
+config = naisConfig()
 dl = Dataloader(config)
+dl.init_data()
 gd = getBatchData(config, dl)
-i=0
-for uData in dl.trainset():
-	print(uData)
-	if i >=1:
-		break
-	i+=1
+
+print(next(gd.getTrainBatches())[0])
+
 

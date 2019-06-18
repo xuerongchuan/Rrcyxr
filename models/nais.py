@@ -114,7 +114,7 @@ class NAIS(object):
             for epoch_count in range(self.config.epoches):
                 #train
                 train_begin = time.time()
-                for train_data in self.gd.generateTrainData():
+                for train_data in self.gd.getTrainBatches():
                     
                     user_input_data = np.array(train_data[0]).astype(np.int32)
                     num_idx_data= np.array(train_data[1]).astype(np.float32)
@@ -132,7 +132,7 @@ class NAIS(object):
                     loss_begin = time.time()
                     train_loss = 0.0
                     batch_i = 0
-                    for train_data in self.gd.generateTrainData():
+                    for train_data in self.gd.getTrainBatches():
                         batch_i +=1
                         user_input_data = np.array(train_data[0]).astype(np.int32)
                         num_idx_data= np.array(train_data[1]).astype(np.float32)
@@ -149,7 +149,7 @@ class NAIS(object):
                                          
                     eval_begin = time.time() 
                     hits, ndcgs, losses = [],[],[]
-                    for test_data in self.gd.generateTestData():
+                    for test_data in self.gd.getTestBatches():
                         user_input_data = np.array(test_data[0]).astype(np.int32)
                         num_idx_data= np.array(test_data[1]).astype(np.float32)
                         item_input_data= np.array(test_data[2]).astype(np.int32)
