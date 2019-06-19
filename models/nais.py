@@ -115,7 +115,6 @@ class NAIS(object):
                 #train
                 train_begin = time.time()
                 for train_data in self.gd.getTrainBatches():
-                    
                     user_input_data = np.array(train_data[0]).astype(np.int32)
                     num_idx_data= np.array(train_data[1]).astype(np.float32)
                     item_input_data= np.array(train_data[2]).astype(np.int32)

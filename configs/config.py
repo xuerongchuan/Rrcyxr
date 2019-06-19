@@ -32,7 +32,8 @@ class naisConfig(Config):
         self.trainfile = 'train.csv'
         self.test_file = 'test.csv'
         self.mode = 'day'
-        self.numrows = 10000
+        self.item_clip = 300
+
         
         self.train_path = self.data_path+self.trainfile
         self.test_path = self.data_path+self.test_file

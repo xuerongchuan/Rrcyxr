@@ -91,8 +91,10 @@ class getBatchData(object):
         u_index = list(range(self.dl.num_users))
         np.random.shuffle(u_index)
         for u in u_index:
-            uhist = list(self.dl.items[u])
-            times = list(self.times[u])
+            hist = list(self.dl.items[u])
+            uhist = hist.copy()
+            uhist = uhist[:self.config.item_clip]
+            times = list(self.times[u])[:self.config.item_clip]
             u_batches = []
             t_batches = []
             i_batches = []
@@ -109,10 +111,10 @@ class getBatchData(object):
                 u_batches.append(chist)
                 t_batches.append(ctime)
                 i_batches.append(i)
-                num_batches.append(len(chist)-1)
+                num_batches.append(len(uhist)-1)
                 ot_batches.append(t)
                 label_batches.append(1)
-                neg_items = self._generate_neg_items(uhist)
+                neg_items = self._generate_neg_items(hist)
                 for neg_i in neg_items:
                     u_batches.append(uhist)
                     t_batches.append(times)
@@ -129,14 +131,13 @@ class getBatchData(object):
             ot_batches = [ot_batches[i] for i in  batches_index]
             label_batches = [label_batches[i] for i in  batches_index]
             yield u_batches, num_batches, i_batches, t_batches, ot_batches, label_batches
-    def getTestData(self, uData):
+    def getTestData(self):
         u_index = list(range(self.dl.num_users))
         np.random.shuffle(u_index)
         for u in u_index:
-            uhist = list(self.dl.items[u])
-            times = list(self.times[u])
+            uhist = list(self.dl.items[u])[:self.config.item_clip]
+            times = list(self.times[u])[:self.config.item_clip]
             u_test_neg = self.dl.test_neg[u]
-
             u_batches = []
             t_batches = []
             i_batches = []
@@ -157,7 +158,7 @@ class getBatchData(object):
 
             batches_index = list(range(len(u_batches)))
             np.random.shuffle(batches_index)
-            u_batches = [u_batches[i] for i in  batches_index]
+            u_batches = np.array([np.array(u_batches[i]) for i in  batches_index])
             num_batches = [num_batches[i] for i in  batches_index]
             i_batches = [i_batches[i] for i in  batches_index]
             t_batches = [t_batches[i] for i in  batches_index]
