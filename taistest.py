@@ -3,8 +3,10 @@ from configs.config import naisConfig
 from readers.naisdataloader import Dataloader, getBatchData
 from models.tais import TAIS
 
-config = naisConfig('day')
+config = naisConfig()
+config.mode = 'day'
 dl = Dataloader(config)
+dl.init_data()
 gd = getBatchData(config, dl)
 tais = TAIS(config, gd)
 tais.build_graph()

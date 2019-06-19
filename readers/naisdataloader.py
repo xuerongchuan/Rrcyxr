@@ -76,6 +76,7 @@ class getBatchData(object):
             self.otimes = self.dl.odays
         else:
             print('错误的mode')
+            sys.exit()
     
     def _generate_neg_items(self, uhist):
         negative_items = []
@@ -131,7 +132,7 @@ class getBatchData(object):
             ot_batches = [ot_batches[i] for i in  batches_index]
             label_batches = [label_batches[i] for i in  batches_index]
             yield u_batches, num_batches, i_batches, t_batches, ot_batches, label_batches
-    def getTestData(self):
+    def getTestBatches(self):
         u_index = list(range(self.dl.num_users))
         np.random.shuffle(u_index)
         for u in u_index:
@@ -152,7 +153,7 @@ class getBatchData(object):
                 ot_batches.append(self.numT)
             u_batches.append(uhist)
             t_batches.append(times)
-            i_batches.append(self.oitems[u])
+            i_batches.append(self.dl.oitems[u])
             num_batches.append(len(uhist))
             ot_batches.append(self.otimes[u])
 

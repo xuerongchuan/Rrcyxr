@@ -9,6 +9,7 @@ class TAIS(object):
         self.config = config
         self.gd = gd
         self.dl = self.gd.dl
+        self.numT = self.gd.numT
     
     def _create_placeholders(self):
         with tf.name_scope('input_data'):
@@ -28,7 +29,7 @@ class TAIS(object):
             self.embedding_Q_ = tf.concat([c1, c2], 0 , name='emebedding_Q_') 
             self.embedding_Q = tf.Variable(tf.truncated_normal(shape=[self.dl.num_items,self.config.embedding_size]), name='embediing_Q', \
                                      dtype=tf.float32)
-            t1 = tf.Variable(tf.truncated_normal(shape=[self.dl.numT, self.config.time_embedding_size], mean=0.0, stddev=0.01),\
+            t1 = tf.Variable(tf.truncated_normal(shape=[self.numT, self.config.time_embedding_size], mean=0.0, stddev=0.01),\
                             name='t1', dtype = tf.float32)
             t2 = tf.constant(0.0, tf.float32, [1, self.config.time_embedding_size], name='t2')
             self.embedding_T = tf.concat([t1, t2], 0 , name='emebedding_T')
@@ -121,7 +122,7 @@ class TAIS(object):
             for epoch_count in range(self.config.epoches):
                 #train
                 train_begin = time.time()
-                for train_data in self.gd.generateTrainData():
+                for train_data in self.gd.getTrainBatches():
                     
                     user_input_data = np.array(train_data[0]).astype(np.int32)
                     num_idx_data= np.array(train_data[1]).astype(np.float32)
@@ -139,7 +140,7 @@ class TAIS(object):
                     loss_begin = time.time()
                     train_loss = 0.0
                     batch_i = 0
-                    for train_data in self.gd.generateTrainData():
+                    for train_data in self.gd.getTrainBatches():
                         batch_i +=1
                         user_input_data = np.array(train_data[0]).astype(np.int32)
                         num_idx_data= np.array(train_data[1]).astype(np.float32)
@@ -156,7 +157,7 @@ class TAIS(object):
                                          
                     eval_begin = time.time() 
                     hits, ndcgs, losses = [],[],[]
-                    for test_data in self.gd.generateTestData():
+                    for test_data in self.gd.getTestBatches():
                         user_input_data = np.array(test_data[0]).astype(np.int32)
                         num_idx_data= np.array(test_data[1]).astype(np.float32)
                         item_input_data= np.array(test_data[2]).astype(np.int32)
