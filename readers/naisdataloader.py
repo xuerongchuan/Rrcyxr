@@ -65,7 +65,7 @@ class getBatchData(object):
         if self.config.mode == 'season':
             self.numT = 9
             self.times = self.dl.seasons
-            self.otimes = self.dl.seasons
+            self.otimes = self.dl.oseasons
         elif self.config.mode == 'month':
             self.numT = 31
             self.times = self.dl.months

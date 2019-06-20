@@ -4,7 +4,7 @@ from readers.naisdataloader import Dataloader, getBatchData
 from models.tais import TAIS
 
 config = naisConfig()
-config.mode = 'day'
+config.mode = 'season'
 dl = Dataloader(config)
 dl.init_data()
 gd = getBatchData(config, dl)

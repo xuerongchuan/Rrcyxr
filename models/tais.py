@@ -36,7 +36,7 @@ class TAIS(object):
             self.bias = tf.Variable(tf.zeros(self.dl.num_items), name='bias')
             
             #attention network variables
-            self.W = tf.Variable(tf.truncated_normal(shape=[self.config.time_embedding_size + self.config.embedding_size, self.config.weight_size], mean=0.0, \
+            self.W = tf.Variable(tf.truncated_normal(shape=[self.config.time_embedding_size + 2*self.config.embedding_size, self.config.weight_size], mean=0.0, \
                             stddev=tf.sqrt(tf.div(2.0, self.config.weight_size + self.config.embedding_size))),name='Weights_for_MLP', dtype=tf.float32, trainable=True)
             self.bias_b = tf.Variable(tf.truncated_normal(shape=[1, self.config.weight_size], mean=0.0, \
                 stddev=tf.sqrt(tf.divide(2.0, self.config.weight_size + self.config.embedding_size))),name='Bias_for_MLP', dtype=tf.float32, trainable=True)
@@ -46,7 +46,7 @@ class TAIS(object):
         with tf.name_scope("attention_MLP"):
             b = tf.shape(q_)[0]
             n = tf.shape(q_)[1]
-            r =self.config.time_embedding_size+self.config.embedding_size
+            r =tf.shape(q_)[2]
             MLP_output = tf.matmul(tf.reshape(q_,[-1,r]), self.W) + self.bias_b #(b*n, e or 2*e) * (e or 2*e, w) + (1, w)
             MLP_output = tf.nn.dropout(MLP_output, 0.5)#(b*n, w)
     #         fc_mean, fc_var = tf.nn.moments(MLP_output, axes=[0,1])
@@ -79,25 +79,27 @@ class TAIS(object):
     
     def _create_inference(self):
         with tf.name_scope("inference"):
-            embedding_q_ = tf.nn.embedding_lookup(self.embedding_Q_, self.user_input) # (b, n, e)
-            embedding_t_ = tf.nn.embedding_lookup(self.embedding_T, self.time_input)   #(b,n,e)
-            self.embedding_q_ = tf.concat([embedding_q_, embedding_t_], axis=2) #(b,n,2e)
+            self.embedding_q_ = tf.nn.embedding_lookup(self.embedding_Q_, self.user_input) # (b, n, e)
+            self.embedding_t_ = tf.nn.embedding_lookup(self.embedding_T, self.time_input)   #(b,n,e)
+            self.embedding_q_ = tf.concat([self.embedding_q_, self.embedding_t_], axis=2) #(b,n,2e)
             
             
-            embedding_q = tf.nn.embedding_lookup(self.embedding_Q, self.item_input) # (b, 1, e)
-            embedding_t = tf.nn.embedding_lookup(self.embedding_T, self.otime_input) # (b, 1, e)
-            self.embedding_q = tf.concat([embedding_q, embedding_t], axis=2)#(b,1,2e)
-            self.embedding_p = self._attention_MLP(self.embedding_q_ * self.embedding_q, self.num_idx, self.time_input) #(b,2e)
-            self.embedding_q = tf.reduce_sum(self.embedding_q, 1) #(b,2e)
+            self.embedding_q = tf.nn.embedding_lookup(self.embedding_Q, self.item_input) # (b, 1, e)
+            # embedding_t = tf.nn.embedding_lookup(self.embedding_T, self.otime_input) # (b, 1, e)
+            n = tf.shape(self.user_input)[1]
+            q_ = tf.concat([self.embedding_q_, tf.tile(self.embedding_q, tf.stack([1,n,1]))], axis=2)#(b,1,3e)
+            self.embedding_p = self._attention_MLP(q_, self.num_idx, self.time_input) #(b,2e)
+            self.embedding_q = tf.reduce_sum(self.embedding_q, 1) #(b,e)
             self.bias_i = tf.nn.embedding_lookup(self.bias, self.item_input)
         #     coeff = tf.pow(num_idx, tf.constant(alpha, tf.float32, [1]))
         #     output = tf.expand_dims(tf.reduce_sum(embedding_p*embedding_q, 1),1) + bias_i
-        #     output = tf.layers.dense(embedding_p*embedding_q, units=1, activation = None)
+            con_q = tf.concat([self.embedding_p, self.embedding_q], axis=1)
+            self.output = tf.layers.dense(con_q, units=1, activation = tf.nn.sigmoid)
         #     output = tf.map_fn(lambda x:x*5.0 , output)
         #     output = tf.layers.dense(embedding_p*embedding_q, units=16, activation = tf.nn.sigmoid)
         #     output = tf.layers.dense(output, 1, None)
 
-            self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.embedding_p*self.embedding_q, 1),1) + self.bias_i)
+            # self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.embedding_p*self.embedding_q, 1),1) + self.bias_i)
     def _create_loss(self):
         with tf.name_scope("loss"):
             self.loss = tf.losses.log_loss(self.labels, self.output) + \
