@@ -21,10 +21,10 @@ class NAIS(object):
             
     def _create_variables(self):
         with tf.name_scope('embeddings'):
-            c1 = tf.Variable(tf.truncated_normal(shape=[self.dl.num_items, self.config.embedding_size], mean=0.0, stddev=0.01),\
+            self.c1 = tf.Variable(tf.truncated_normal(shape=[self.dl.num_items, self.config.embedding_size], mean=0.0, stddev=0.01),\
                             name='c1', dtype = tf.float32)
-            c2 = tf.constant(0.0, tf.float32, [1, self.config.embedding_size], name='c2')
-            self.embedding_Q_ = tf.concat([c1, c2], 0 , name='emebedding_Q_') 
+            self.c2 = tf.constant(0.0, tf.float32, [1, self.config.embedding_size], name='c2')
+            self.embedding_Q_ = tf.concat([self.c1, self.c2], 0 , name='emebedding_Q_') 
             self.embedding_Q = tf.Variable(tf.truncated_normal(shape=[self.dl.num_items,self.config.embedding_size]), name='embediing_Q', \
                                      dtype=tf.float32)
 #            t1 = tf.Variable(tf.truncated_normal(shape=[self.dl.numT+1, self.config.embedding_size], mean=0.0, stddev=0.01),\

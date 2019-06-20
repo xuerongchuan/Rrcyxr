@@ -123,14 +123,14 @@ class getBatchData(object):
                     num_batches.append(len(uhist))
                     ot_batches.append(self.numT)
                     label_batches.append(0)
-            batches_index = list(range(len(u_batches)))
-            np.random.shuffle(batches_index)
-            u_batches = [u_batches[i] for i in  batches_index]
-            num_batches = [num_batches[i] for i in  batches_index]
-            i_batches = [i_batches[i] for i in  batches_index]
-            t_batches = [t_batches[i] for i in  batches_index]
-            ot_batches = [ot_batches[i] for i in  batches_index]
-            label_batches = [label_batches[i] for i in  batches_index]
+            # batches_index = list(range(len(u_batches)))
+            # np.random.shuffle(batches_index)
+            # u_batches = [u_batches[i] for i in  batches_index]
+            # num_batches = [num_batches[i] for i in  batches_index]
+            # i_batches = [i_batches[i] for i in  batches_index]
+            # t_batches = [t_batches[i] for i in  batches_index]
+            # ot_batches = [ot_batches[i] for i in  batches_index]
+            # label_batches = [label_batches[i] for i in  batches_index]
             yield u_batches, num_batches, i_batches, t_batches, ot_batches, label_batches
     def getTestBatches(self):
         u_index = list(range(self.dl.num_users))
@@ -157,14 +157,14 @@ class getBatchData(object):
             num_batches.append(len(uhist))
             ot_batches.append(self.otimes[u])
 
-            batches_index = list(range(len(u_batches)))
-            np.random.shuffle(batches_index)
-            u_batches = np.array([np.array(u_batches[i]) for i in  batches_index])
-            num_batches = [num_batches[i] for i in  batches_index]
-            i_batches = [i_batches[i] for i in  batches_index]
-            t_batches = [t_batches[i] for i in  batches_index]
-            ot_batches = [ot_batches[i] for i in  batches_index]
-            label_batches = [label_batches[i] for i in  batches_index]
+            # batches_index = list(range(len(u_batches)))
+            # np.random.shuffle(batches_index)
+            # u_batches = np.array([np.array(u_batches[i]) for i in  batches_index])
+            # num_batches = [num_batches[i] for i in  batches_index]
+            # i_batches = [i_batches[i] for i in  batches_index]
+            # t_batches = [t_batches[i] for i in  batches_index]
+            # ot_batches = [ot_batches[i] for i in  batches_index]
+            # label_batches = [label_batches[i] for i in  batches_index]
             yield u_batches, num_batches, i_batches, t_batches, ot_batches, label_batches
     # def getNormalInputData(self, u, uData):
      
