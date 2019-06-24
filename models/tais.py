@@ -88,18 +88,19 @@ class TAIS(object):
             # embedding_t = tf.nn.embedding_lookup(self.embedding_T, self.otime_input) # (b, 1, e)
             n = tf.shape(self.user_input)[1]
             q_ = tf.concat([self.embedding_q_, tf.tile(self.embedding_q, tf.stack([1,n,1]))], axis=2)#(b,1,3e)
-            self.embedding_p = self._attention_MLP(q_, self.num_idx, self.time_input) #(b,2e)
+            self.embedding_p = self._attention_MLP(q_, self.num_idx, self.time_input) #(b,3e)
+            self.embedding_p = tf.layers.dense(self.embedding_p, units=self.config.embedding_size, activation = tf.nn.relu)#(b,2e)
             self.embedding_q = tf.reduce_sum(self.embedding_q, 1) #(b,e)
             self.bias_i = tf.nn.embedding_lookup(self.bias, self.item_input)
         #     coeff = tf.pow(num_idx, tf.constant(alpha, tf.float32, [1]))
         #     output = tf.expand_dims(tf.reduce_sum(embedding_p*embedding_q, 1),1) + bias_i
-            con_q = tf.concat([self.embedding_p, self.embedding_q], axis=1)
-            self.output = tf.layers.dense(con_q, units=1, activation = tf.nn.sigmoid)
+            #con_q = tf.concat([self.embedding_p, self.embedding_q], axis=1)
+        
         #     output = tf.map_fn(lambda x:x*5.0 , output)
         #     output = tf.layers.dense(embedding_p*embedding_q, units=16, activation = tf.nn.sigmoid)
         #     output = tf.layers.dense(output, 1, None)
 
-            # self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.embedding_p*self.embedding_q, 1),1) + self.bias_i)
+            self.output = tf.sigmoid(tf.expand_dims(tf.reduce_sum(self.embedding_p*self.embedding_q, 1),1) + self.bias_i)
     def _create_loss(self):
         with tf.name_scope("loss"):
             self.loss = tf.losses.log_loss(self.labels, self.output) + \
