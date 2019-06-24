@@ -75,7 +75,7 @@ def cut_31Data():
     c28 = getTime('2002-12-1')
     c29 = getTime('2003-1-1')
     c30 = getTime('2003-2-1')
-    c31 = getTime('2003-3-1')
+    c31 = getTime('2003-3-2')
     return [0,c1,c2,c3,c4,c5,c6,c7,c8,c9,c10,c11,c12,c13,c14,c15,c16,c17,c18,c19, \
             c20,c21,c22,c23,c24,c25,c26,c27,c28,c29,c30,c31]
     

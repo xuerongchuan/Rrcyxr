@@ -28,11 +28,12 @@ class naisConfig(Config):
     def __init__(self):
         super(naisConfig, self).__init__()       
         #naisData
-        self.data_path = 'data/'
+        self.data_path = '../data/'
         self.trainfile = 'train.csv'
         self.test_file = 'test.csv'
         self.mode = 'day'
         self.item_clip = 300
+        self.num_users = 6040
 
         
         self.train_path = self.data_path+self.trainfile
