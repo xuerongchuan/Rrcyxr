@@ -2,7 +2,7 @@
 import os
 import sys
 import pandas as pd
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, train_test_split
 from utils.timeHelper import getDate,getTime
 
 
@@ -31,7 +31,9 @@ def splitByUser(data_path):
     pd.concat(cv4).to_csv('data/cv/data-3.csv', header=False, index=False)
     pd.concat(cv5).to_csv('data/cv/data-4.csv', header=False, index=False)
 
-
+def random_split(data, test_size_rate):
+    train, test = train_test_split(data, test_size=test_size_rate)
+    return train, test
 def cut_9data():
     c1 = getTime('2000-9-1')
     c2 = getTime('2001-1-1')
