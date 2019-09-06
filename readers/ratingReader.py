@@ -5,9 +5,9 @@ from collections import defaultdict
 class RatingGetter(object):
     """获取将第k折数据作为测试集的数据集，并计算保存一些必要的属性"""
     
-    def __init__(self, k, config):
+    def __init__(self, config):
         #一些必要的统计数据信息
-        self.current_k = k #选取第k个cv集作为测试集
+        #self.current_k = k #选取第k个cv集作为测试集
         self.user= {} #user2id字典
         self.item= {} #item2id字典
         self.all_user = {} # 数据集中所有的用户字典
@@ -35,29 +35,33 @@ class RatingGetter(object):
         self.get_data_statistics()
         
     def trainSet(self):
-        k = self.current_k
-        for i in range(self.config.k_fold_num):
-            if i != k:
-                data_path = self.config.rating_cv_path+self.config.dataset_name \
-                + '-' + str(i) +'.csv'
-                if not os.path.isfile(data_path):
-                    print('the format of rating data is wrong!', data_path)
-                    sys.exit()
-                with open(data_path, 'r') as f:
-                    for index, line in enumerate(f):
-                        u, i, r = line.strip('\r\n').split(self.config.sep)
-                        yield (int(u), int(i), float(r))
+        data_path = self.config.train_path
+        if not os.path.isfile(data_path):
+            print('the format of rating data is wrong!', data_path)
+            sys.exit()
+        with open(data_path, 'r') as f:
+            for index, line in enumerate(f):
+                if index == 0:
+                    continue
+                if self.config.test and index == 10000:
+                    break
+                u, i, r,_ = line.strip('\r\n').split(self.config.sep)
+                yield (int(u), int(i), float(r))
     def testSet(self):
-        k = self.current_k
-        data_path = self.config.rating_cv_path+self.config.dataset_name \
-                + '-' + str(k) +'.csv'
+        data_path = self.config.train_path
         if not os.path.isfile(data_path):
             print('the format of rating data is wrong', data_path)
             sys.exit()
         with open(data_path) as f:
             for index, line in enumerate(f):
-                u, i ,r = line.strip('\r\n').split(self.config.sep)
+                if index == 0:
+                    continue
+                if self.config.test and index == 10000:
+                    break
+                u, i ,r,_ = line.strip('\r\n').split(self.config.sep)
                 yield (int(u), int(i), float(r))
+    def weighted_sampling(self, data):
+        pass
     def get_train_size(self):
         return (len(self.user), len(self.item))
     def generate_data_set(self):

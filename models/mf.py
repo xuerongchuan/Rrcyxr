@@ -11,9 +11,10 @@ class MF(object):
     '''矩阵分解算法的父类'''
     def __init__(self, config):
         self.config = config
+        self.rg = RatingGetter(config)
         pass
-    def init_model(self, k):
-        self.rg = RatingGetter(k, self.config)
+    def init_model(self):
+        
         self.P= np.random.rand(self.rg.get_train_size()[0], self.config.factor)/ \
         (self.config.factor**0.5)
         self.Q = np.random.rand(self.rg.get_train_size()[1], self.config.factor)/ \
